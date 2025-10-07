@@ -31,6 +31,7 @@ import {
   FaMapMarkerAlt,
   FaChevronLeft,
   FaChevronRight,
+  FaUsers, // Add this
 } from "react-icons/fa";
 import { GiWaterDrop, GiPlantWatering, GiChemicalDrop } from "react-icons/gi";
 
@@ -41,6 +42,7 @@ export default function LandingPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [currentPost, setCurrentPost] = useState(0);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     setIsVisible(true);
@@ -50,25 +52,37 @@ export default function LandingPage() {
   const facebookPosts = [
     {
       id: 1,
-      image: "/assets/hh.png",
+      image: "/assets/new/9.png",
       title: "Customer Review",
       description: "Amazing results with our Anti-Dandruff formula!",
     },
     {
       id: 2,
-      image: "/assets/bb.png",
+      image: "/assets/new/2.png",
       title: "Before & After",
       description: "Real results from our Hair Fall Control variant",
     },
     {
       id: 3,
-      image: "/assets/ii.png",
+      image: "/assets/new/3.png",
       title: "Eco-Friendly Packaging",
       description: "See how we're reducing plastic waste",
     },
     {
       id: 4,
-      image: "/assets/ee.png",
+      image: "/assets/new/4.png",
+      title: "Herbal Ingredients",
+      description: "Meet the natural ingredients behind our formulas",
+    },
+    {
+      id: 5,
+      image: "/assets/new/5.png",
+      title: "Herbal Ingredients",
+      description: "Meet the natural ingredients behind our formulas",
+    },
+    {
+      id: 6,
+      image: "/assets/new/6.png",
       title: "Herbal Ingredients",
       description: "Meet the natural ingredients behind our formulas",
     },
@@ -203,7 +217,7 @@ export default function LandingPage() {
       solution: "Anti-Dandruff Formula with Neem + Tulsi + Amla",
       description:
         "Neem's natural antifungal properties target dandruff-causing fungus while Tulsi soothes itching and Amla strengthens follicles.",
-      image: "/assets/ii.png",
+      image: "/assets/new/1.png",
       variantIndex: 0,
     },
     {
@@ -212,7 +226,7 @@ export default function LandingPage() {
       solution: "Hair Fall Control with Bhringraj + Hibiscus + Amla",
       description:
         "Bhringraj stimulates growth, Hibiscus strengthens roots, and Amla prevents premature greying for thicker, stronger hair.",
-      image: "/assets/ee.png",
+      image: "/assets/new/10.png",
       variantIndex: 1,
     },
     {
@@ -221,7 +235,7 @@ export default function LandingPage() {
       solution: "Refreshing Formula with Shikakai + Reetha + Lemon Peel",
       description:
         "Shikakai regulates oil, Reetha provides gentle cleansing, and Lemon Peel adds freshness while controlling oiliness.",
-      image: "/assets/ff.png",
+      image: "/assets/new/9.png",
       variantIndex: 2,
     },
     {
@@ -230,7 +244,7 @@ export default function LandingPage() {
       solution: "Nourishing Formula with Fenugreek + Aloe Vera + Amla",
       description:
         "Fenugreek deeply conditions, Aloe Vera hydrates, and Amla adds strength for smooth, manageable hair.",
-      image: "/assets/gg.png",
+      image: "/assets/new/8.png",
       variantIndex: 3,
     },
   ];
@@ -331,7 +345,7 @@ export default function LandingPage() {
     {
       icon: FaInstagram,
       label: "Instagram",
-      link: "https://www.facebook.com/profile.php?id=61580669037299",
+      link: "https://www.instagram.com/luxyherb/",
     },
     // { icon: FaTiktok, label: "TikTok" },
     // { icon: FaYoutube, label: "YouTube" },
@@ -341,19 +355,44 @@ export default function LandingPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          message: message,
+          variant: variants[selectedVariant].name,
+        }),
+      });
 
-    console.log(
-      "Email submitted:",
-      email,
-      "Variant:",
-      variants[selectedVariant].name
-    );
+      const data = await response.json();
 
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    setEmail("");
+      if (!response.ok) {
+        throw new Error(data.error || "Something went wrong");
+      }
+
+      console.log(
+        "Email submitted:",
+        email,
+        "Variant:",
+        variants[selectedVariant].name,
+        "Message:",
+        message
+      );
+
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      setEmail("");
+      setMessage("");
+    } catch (error) {
+      console.error("Submission error:", error);
+      setIsSubmitting(false);
+      // You can add error state handling here if needed
+      alert("Failed to join waitlist. Please try again.");
+    }
   };
 
   if (isSubmitted) {
@@ -651,6 +690,21 @@ export default function LandingPage() {
                     <FaEnvelope className="text-gray-400" />
                   </div>
                 </div>
+
+                {/* Optional Message Field */}
+                <div className="relative">
+                  <textarea
+                    placeholder="Any suggestions, reviews, or specific hair concerns? (Optional)"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    rows="3"
+                    className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 sm:focus:ring-3 focus:ring-green-500 focus:border-transparent text-base sm:text-lg shadow-sm resize-none"
+                  />
+                  <div className="absolute top-3 right-3 flex items-center">
+                    <span className="text-xs text-gray-400">Optional</span>
+                  </div>
+                </div>
+
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -874,6 +928,168 @@ export default function LandingPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+
+        {/* Social Media Follow Section */}
+        <div
+          className={`mb-12 sm:mb-20 transition-all duration-500 delay-900 ${
+            isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+          }`}
+        >
+          <div className="text-center mb-8">
+            <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center space-x-3">
+              <FaHeart className="text-red-500" />
+              <span>Join Our Growing Community</span>
+            </h2>
+            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+              Follow us on social media for daily hair care tips,
+              behind-the-scenes content, exclusive offers, and to see real
+              results from our community!
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Facebook Card */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl p-6 sm:p-8 shadow-xl border border-blue-200 transform hover:scale-105 transition duration-300 group">
+              <div className="text-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300">
+                  <FaFacebook className="text-white text-3xl" />
+                </div>
+
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  Facebook
+                </h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Join our Facebook family! Get exclusive content, live Q&A
+                  sessions, and be the first to know about new product launches.
+                </p>
+
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                    <FaStar className="text-yellow-500" />
+                    <span>Daily hair care tips</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                    <FaStar className="text-yellow-500" />
+                    <span>Exclusive offers</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                    <FaStar className="text-yellow-500" />
+                    <span>Community support</span>
+                  </div>
+                </div>
+
+                <a
+                  href="https://www.facebook.com/profile.php?id=61580669037299"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-3"
+                >
+                  <FaFacebook className="w-5 h-5" />
+                  <span>Follow @LuxyHerb</span>
+                </a>
+
+                <p className="text-xs text-gray-500 mt-3 flex items-center justify-center space-x-1">
+                  <FaUsers className="w-3 h-3" />
+                  <span>Join our growing Facebook community</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Instagram Card */}
+            <div className="bg-gradient-to-br from-pink-50 to-purple-100 rounded-3xl p-6 sm:p-8 shadow-xl border border-pink-200 transform hover:scale-105 transition duration-300 group">
+              <div className="text-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300">
+                  <FaInstagram className="text-white text-3xl" />
+                </div>
+
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  Instagram
+                </h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Follow our Instagram for visual transformations, reels,
+                  stories, and to see real customer results with our herbal
+                  products.
+                </p>
+
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                    <FaStar className="text-yellow-500" />
+                    <span>Before & After results</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                    <FaStar className="text-yellow-500" />
+                    <span>Video tutorials</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                    <FaStar className="text-yellow-500" />
+                    <span>Product launches</span>
+                  </div>
+                </div>
+
+                <a
+                  href="https://www.instagram.com/luxyherb/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-3"
+                >
+                  <FaInstagram className="w-5 h-5" />
+                  <span>Follow @LuxyHerb</span>
+                </a>
+
+                <p className="text-xs text-gray-500 mt-3 flex items-center justify-center space-x-1">
+                  <FaUsers className="w-3 h-3" />
+                  <span>See real transformations daily</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Social Proof Stats */}
+          <div className="mt-12 bg-white/80 backdrop-blur-sm rounded-3xl p-6 sm:p-8 shadow-lg border border-green-100 max-w-2xl mx-auto">
+            <div className="text-center">
+              <h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center justify-center space-x-2">
+                <FaUsers className="text-green-600" />
+                <span>Why Join Our Social Community?</span>
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <FaCertificate className="text-green-600 text-xl" />
+                  </div>
+                  <h5 className="font-semibold text-gray-900">
+                    Exclusive Content
+                  </h5>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Tips not shared elsewhere
+                  </p>
+                </div>
+
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <FaShippingFast className="text-green-600 text-xl" />
+                  </div>
+                  <h5 className="font-semibold text-gray-900">Early Access</h5>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Be first for new launches
+                  </p>
+                </div>
+
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <FaHeart className="text-green-600 text-xl" />
+                  </div>
+                  <h5 className="font-semibold text-gray-900">
+                    Community Support
+                  </h5>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Connect with other users
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
